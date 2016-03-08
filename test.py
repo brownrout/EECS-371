@@ -86,7 +86,8 @@ def build_playlist(artist_dict):
     # grab tags from query
     tags = list()
     for tag in soup.find_all("tag"):
-        tags.append(tag.find("name").text)
+        if isAscii(tag.find("name").text):
+            tags.append(tag.find("name").text)
     artist_dict['tags'] = tags
 
     # grab the similar artists
