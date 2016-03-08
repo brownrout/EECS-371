@@ -33,8 +33,12 @@ def get_artist_info(artist_dict):
     r = urllib.urlopen("http://musicbrainz.org/ws/2/artist?query=artist:\""+artist.replace(' ','%')+"\"").read()
     soup = BeautifulSoup(r, "lxml")
 
+    artist_dict['artist_id'] = ""
     # grab artist id from the query page
-    artist_dict['artist_id'] = soup.find("artist-list").find("artist").get("id")
+    if (soup.find("artist-list").find("artist") is not None):
+        artist_dict['artist_id'] = soup.find("artist-list").find("artist").get("id")
+    else:
+        return
     # grab artists disambiguation
     if soup.find("artist").find("disambiguation"):
         artist_dict['disambiguation'] = soup.find("artist").find("disambiguation").text
@@ -63,8 +67,12 @@ def build_playlist(artist_dict):
     r = urllib.urlopen("http://musicbrainz.org/ws/2/artist?query=artist:\""+artist.replace(' ','%')+"\"").read()
     soup = BeautifulSoup(r, "lxml")
 
+    artist_dict['artist_id'] = ""
     # grab artist id from the query page
-    artist_dict['artist_id'] = soup.find("artist-list").find("artist").get("id")
+    if (soup.find("artist-list").find("artist") is not None):
+        artist_dict['artist_id'] = soup.find("artist-list").find("artist").get("id")
+    else:
+        return
 
     # grab tags from query
     tags = list()
@@ -125,32 +133,38 @@ def main():
         if (user_input == 1):
             get_artist_info(artist_dict)
             print "\n"
-            if len(artist_dict['similar artists']) == 0:
-                print "sorry, we couldn't find any artists similar to " + artist_dict['artist_name'].lower()
-            elif len(artist_dict['similar artists']) <= 10:
-                print "the top " + str(len(artist_dict['similar artists'])) + " artists similar to " + artist_dict['artist_name'].lower() + " are:"
+            if (artist_dict['artist_id'] != ""):
+                if len(artist_dict['similar artists']) == 0:
+                    print "sorry, we couldn't find any artists similar to " + artist_dict['artist_name'].lower()
+                elif len(artist_dict['similar artists']) <= 10:
+                    print "the top " + str(len(artist_dict['similar artists'])) + " artists similar to " + artist_dict['artist_name'].lower() + " are:"
+                else:
+                    print "the top 10 of " + str(len(artist_dict['similar artists'])) + " most similar artists related to " + artist_dict['artist_name'].lower() + " are:"
+                for index,x in enumerate(artist_dict['similar artists']):
+                    if index <= 9:
+                        print x[0].lower() + " - score: " + str(x[1])
+                print "\n"
             else:
-                print "the top 10 of " + str(len(artist_dict['similar artists'])) + " most similar artists related to " + artist_dict['artist_name'].lower() + " are:"
-            for index,x in enumerate(artist_dict['similar artists']):
-                if index <= 9:
-                    print x[0].lower() + " - score: " + str(x[1])
-            print "\n"
+                print "hrmm, something went wrong, please try a new artist\n"
+                
         elif (user_input == 2):
             #Build Eric Playlist
             build_playlist(artist_dict)
             print "\n"
-            
-            if len(artist_dict['playlist-one']) == 0:
-                print "sorry, we couldn't build a playlist of songs similar to " + artist_dict['artist_name'].lower()
-            elif len(artist_dict['playlist-one']) <= 10:
-                print "the top " + str(len(artist_dict['playlist-one'])) + " songs similar to " + artist_dict['artist_name'].lower() + " are:"
+            if (artist_dict['artist_id'] != ""):
+                if len(artist_dict['playlist-one']) == 0:
+                    print "sorry, we couldn't build a playlist of songs similar to " + artist_dict['artist_name'].lower()
+                elif len(artist_dict['playlist-one']) <= 10:
+                    print "the top " + str(len(artist_dict['playlist-one'])) + " songs similar to " + artist_dict['artist_name'].lower() + " are:"
+                else:
+                    print "the top 10 of " + str(len(artist_dict['playlist-one'])) + " most similar songs related to " + artist_dict['artist_name'].lower() + " are:"
+                
+                for index,x in enumerate(artist_dict['playlist-one']):
+                    if index <= 9:
+                        print x[0].lower() + " / " + x[1].lower() + " - score: " + str(x[2])
+                print "\n"
             else:
-                print "the top 10 of " + str(len(artist_dict['playlist-one'])) + " most similar songs related to " + artist_dict['artist_name'].lower() + " are:"
-            
-            for index,x in enumerate(artist_dict['playlist-one']):
-                if index <= 9:
-                    print x[0].lower() + " / " + x[1].lower() + " - score: " + str(x[2])
-            print "\n"
+                print "hrmm, something went wrong, please try a new artist\n"
         else:
             print "invalid choice\n"
 
