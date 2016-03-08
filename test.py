@@ -33,12 +33,15 @@ def get_artist_info(dct):
     for x in dct['tags']:
         url += "+tag:"+x
 
+    # grab the similar artists
     r = urllib.urlopen(url).read()
     soup = BeautifulSoup(r, "lxml")
     artist_names = list()
     for element in soup.find_all("artist"):
-        artist_names.append(element.find("name").text)
-    print artist_names
+        _name = element.find("name").text
+        if _name.lower() != dct["artist_name"].lower():
+            artist_names.append(_name)
+    dct['similar artists'] = artist_names
 
 
     return
