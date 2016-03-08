@@ -33,14 +33,25 @@ def get_artist_info(artist_dict):
     r = urllib.urlopen("http://musicbrainz.org/ws/2/artist?query=artist:\""+artist.replace(' ','%')+"\"").read()
     soup = BeautifulSoup(r, "lxml")
 
+    print "http://musicbrainz.org/ws/2/artist?query=artist:\""+artist.replace(' ','%')+"\""
+
     # grab artist id from the query page
     artist_dict['artist_id'] = soup.find("artist-list").find("artist").get("id")
+    # grab artists disambiguation
+    if soup.find("artist").find("disambiguation"):
+        artist_dict['disambiguation'] = soup.find("artist").find("disambiguation").text
+    # grab the area
+    #artist_dict['location'] = soup.find("artist").find("area").find("_name")
+
+
 
     # grab tags from query
     tags = list()
     for tag in soup.find_all("tag"):
         tags.append(tag.find("name").text)
     artist_dict['tags'] = tags
+
+
 
     # grab the similar artists
     artist_names = get_similar_artists(artist_dict['artist_name'], artist_dict['tags'])
@@ -69,14 +80,15 @@ def main():
             print "\n"
             if len(artist_dict['similar artists']) == 0:
                 print "sorry, we couldn't find any artists similar to " + artist_dict['artist_name'].lower()
-            elif len(artist_dict['similar artists']) <= 5:
+            elif len(artist_dict['similar artists']) <= 10:
                 print "the top " + str(len(artist_dict['similar artists'])) + " artists similar to " + artist_dict['artist_name'].lower() + " are:"
             else:
-                print "the top 5 of " + str(len(artist_dict['similar artists'])) + " most similar artists related to " + artist_dict['artist_name'].lower() + " are:"
+                print "the top 10 of " + str(len(artist_dict['similar artists'])) + " most similar artists related to " + artist_dict['artist_name'].lower() + " are:"
             for index,x in enumerate(artist_dict['similar artists']):
-                if index <= 4:
+                if index <= 9:
                     print x[0].lower() + " - score: " + str(x[1])
             print "\n"
+            print artist_dict
         else:
             print "invalid choice\n"
 
