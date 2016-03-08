@@ -5,8 +5,11 @@ import urllib
 def get_similar_artists(artist, tags):
     # construct search url
     url = "http://musicbrainz.org/ws/2/artist?query="
-    for tag in tags:
-        url += "+tag:"+tag.replace(' ','%')
+    stop = len(tags)-1
+    for index, tag in enumerate(tags):
+        url += "tag:" + tag.replace(' ','%')
+        if index != stop:
+            url += "%20AND%20"
 
     # get response
     r = urllib.urlopen(url).read()
@@ -15,18 +18,16 @@ def get_similar_artists(artist, tags):
     # parse response
     artist_names = list()
     for element in soup.find_all("artist"):
+        _score = element.get('ext:score')
         _name = element.find("name").text
-        if _name.lower() != artist.lower():
-            artist_names.append(_name)
+        if _name.lower() != artist.lower() and int(_score) > 60:
+            artist_names.append([_name,_score])
 
     return artist_names
 
-def get_artist_info():
+def get_artist_info(artist_dict):
 
-    artist_dict = dict()
-    #query user for the artist, and make sure it is url friendly
-    artist = str(raw_input('Which artist would you like to search: '))
-    artist_dict['artist_name'] = artist
+    artist = artist_dict["artist_name"]
 
     # create the new url for query
     r = urllib.urlopen("http://musicbrainz.org/ws/2/artist?query=artist:\""+artist.replace(' ','%')+"\"").read()
@@ -45,20 +46,31 @@ def get_artist_info():
     artist_names = get_similar_artists(artist_dict['artist_name'], artist_dict['tags'])
     artist_dict['similar artists'] = artist_names
 
-    return artist_dict
+    return
+
+# artist_dict = dict()
+# #query user for the artist, and make sure it is url friendly
+# artist = str(raw_input('Which artist would you like to search: '))
+# artist_dict['artist_name'] = artist
 
 def main():
     '''This is our main function!'''
 
     print "starting music app...\n"
+    artist_dict = dict()
 
     while True:
-        print '\n'
-        print "\nOptions:\n1. Get Artist Info"
-        user_input = input("Choose a function: ")
+        artist = str(raw_input('enter an artist: '))
+        artist_dict['artist_name'] = artist
+        print "\noptions:\n1. find similar artists\n"
+        user_input = input("choose a function: ")
         if (user_input == 1):
-            artist_info = get_artist_info()
-            print artist_info
+            get_artist_info(artist_dict)
+            print "\n"
+            print "we found " + str(len(artist_dict['similar artists'])) + " artists related to " + artist_dict['artist_name'].lower() + ":"
+            for x in artist_dict['similar artists']:
+                print x[0].lower() + " - score: " + str(x[1])
+            print "\n"
         else:
             print "Invalid choice\n"
 
