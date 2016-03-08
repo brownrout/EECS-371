@@ -11,6 +11,8 @@ def isAscii(s):
     return True
 
 def get_similar_artists(artist, tags):
+    """ Search for similar artist based on tags from musicbrainz """
+
     # construct search url
     url = "http://musicbrainz.org/ws/2/artist?query="
     stop = len(tags)-1
@@ -34,6 +36,7 @@ def get_similar_artists(artist, tags):
     return artist_names
 
 def get_artist_info(artist_dict):
+    """ Search for all information on artist from musicbrainz xml """
 
     artist = artist_dict["artist_name"]
 
@@ -47,11 +50,9 @@ def get_artist_info(artist_dict):
         artist_dict['artist_id'] = soup.find("artist-list").find("artist").get("id")
     else:
         return
-    # grab artists disambiguation
-    if soup.find("artist").find("disambiguation"):
-        artist_dict['disambiguation'] = soup.find("artist").find("disambiguation").text
-    # grab the area
-    #artist_dict['location'] = soup.find("artist").find("area").find("_name")
+
+    # get artist facts
+    get_facts(artist_dict, soup)
 
     # grab tags from query
     tags = list()
@@ -68,7 +69,63 @@ def get_artist_info(artist_dict):
 
     return
 
+def get_facts(input_dict, soup):
+    """ Search for potential facts from musicbrainz xml """
+
+    if soup.find("artist").find("disambiguation"):
+        input_dict['disambiguation'] = soup.find("artist").find("disambiguation").text
+    # grab the area
+    if soup.find("artist").find("area"):
+        input_dict['area'] = soup.find("artist").find("area").text
+    # grab the beginarea
+    if soup.find("artist").find("begin-area"):
+        input_dict['beginarea'] = soup.find("artist").find("begin-area").find("name").text
+    # grab the endarea
+    if soup.find("artist").find("end-area"):
+        input_dict['endarea'] = soup.find("artist").find("end-area").find("name").text
+    # grab the ended
+    if soup.find("artist").find("ended"):
+        input_dict['ended'] = soup.find("artist").find("ended").text
+    # grab the end
+    if soup.find("artist").find("end"):
+        input_dict['end'] = soup.find("artist").find("end").text
+    # grab the begin
+    if soup.find("artist").find("begin"):
+        input_dict['begin'] = soup.find("artist").find("begin").text
+    return
+
+def pretty_print_artist_facts(input_dict):
+    """ Print artist facts if applicable """
+
+    pretty_statements = list()
+    a_name = input_dict.get("artist_name")
+
+    # search for potential facts to print in artist_dict
+    if input_dict.get('disambiguation'):
+        pretty_statements.append("Disambiguation: {}".format(input_dict.get('disambiguation')))
+    if input_dict.get('area'):
+        pretty_statements.append("Area: {}".format(input_dict.get('area')))
+    if input_dict.get('begin'):
+        pretty_statements.append("Born/Started in: {}".format(input_dict.get('begin')))
+    if input_dict.get('beginarea'):
+        pretty_statements.append("Begin Area: {}".format(input_dict.get('beginarea')))
+    if input_dict.get('end'):
+        pretty_statements.append("End: {}".format(input_dict.get('end')))
+    elif input_dict.get('ended'):
+        pretty_statements.append("Ended: {}".format(input_dict.get('ended')))
+    if input_dict.get('endarea'):
+        pretty_statements.append("End Area: {}".format(input_dict.get('endarea')))
+    if len(pretty_statements) == 0:
+        pretty_statements.append("There doesn't seem to be much on this artist. Congratulations, you're officially a hipster")
+
+    # print all facts and return
+    print "\n".join(pretty_statements)
+    pretty_statements = list()
+    return
+
+
 def build_playlist(artist_dict):
+    """ Build a playlist of songs for user """
 
     artist = artist_dict["artist_name"]
 
@@ -97,6 +154,7 @@ def build_playlist(artist_dict):
     return
 
 def get_tracks(artist, tags):
+    """ Gather tracks and youtube urls from tags given in musicbrainz xml """
     # construct search url
     url = "http://musicbrainz.org/ws/2/work?query="
     stop = len(tags)-1
@@ -142,10 +200,17 @@ def main():
     while True:
         artist = str(raw_input('enter an artist: '))
         artist_dict['artist_name'] = artist
-        print "\noptions:\n1. find similar artists\n2. build playlist based off artist\n"
+        print "\noptions:\n1. get artist info\n2. find similar artists\n3. build playlist based off artist\n"
         user_input = input("choose a function: ")
         if (user_input == 1):
-            get_artist_info(artist_dict)
+            print "\n"
+            if len(artist_dict) <= 1:
+                get_artist_info(artist_dict)
+            pretty_print_artist_facts(artist_dict)
+            print "\n"
+        elif (user_input == 2):
+            if len(artist_dict) <= 1:
+                get_artist_info(artist_dict)
             print "\n"
             if (artist_dict['artist_id'] != ""):
                 if len(artist_dict['similar artists']) == 0:
@@ -161,7 +226,7 @@ def main():
             else:
                 print "hrmm, something went wrong, please try a new artist\n"
 
-        elif (user_input == 2):
+        elif (user_input == 3):
             print "This may take a second...\n"
             build_playlist(artist_dict)
             print "\n"
@@ -172,7 +237,6 @@ def main():
                     print "the top " + str(len(artist_dict['playlist-one'])) + " songs similar to " + artist_dict['artist_name'].lower() + " are:"
                 else:
                     print "the top 10 of " + str(len(artist_dict['playlist-one'])) + " most similar songs related to " + artist_dict['artist_name'].lower() + " are:"
-
                 for index,x in enumerate(artist_dict['playlist-one']):
                     if index <= 9:
                         print x[0].lower() + " / " + x[1].lower() + " - score: " + str(x[2]) + " - video: " + x[3]
