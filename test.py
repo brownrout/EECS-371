@@ -1,6 +1,7 @@
 '''Version 0.1'''
 from bs4 import BeautifulSoup
 import urllib
+from yt import getYTLink
 
 def get_similar_artists(artist, tags):
     # construct search url
@@ -108,9 +109,13 @@ def get_tracks(artist, tags):
             _score = element.get('ext:score')
             _name = element.find("title").text
             _artist = element.find("relation-list").find("name").text
+            try:
+                _video = getYTLink(_name + " " + _artist)
+            except KeyError:
+                continue
             if (_artist not in artists):
                 artists.append(_artist)
-                track_names.append([_name,_artist,_score])
+                track_names.append([_name,_artist,_score,_video])
 
     return track_names
 
@@ -146,9 +151,9 @@ def main():
                 print "\n"
             else:
                 print "hrmm, something went wrong, please try a new artist\n"
-                
+
         elif (user_input == 2):
-            #Build Eric Playlist
+            print "This may take a second...\n"
             build_playlist(artist_dict)
             print "\n"
             if (artist_dict['artist_id'] != ""):
@@ -161,7 +166,7 @@ def main():
                 
                 for index,x in enumerate(artist_dict['playlist-one']):
                     if index <= 9:
-                        print x[0].lower() + " / " + x[1].lower() + " - score: " + str(x[2])
+                        print x[0].lower() + " / " + x[1].lower() + " - score: " + str(x[2]) + " - video: " + x[3]
                 print "\n"
             else:
                 print "hrmm, something went wrong, please try a new artist\n"
