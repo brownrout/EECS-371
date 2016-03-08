@@ -7,6 +7,19 @@ import subprocess
 
 # output = test.communicate()[0]
 
+def artistSearchWrite (artist):
+    target = open('prolog.pl', 'w')
+    line1 = ":- use_module(library(musicbrainz))."
+    line2 = ":- mb_search(artist,\'" + artist + "\',_Score,E), forall(mb_facet(E,F),(print(F),nl))."
+    line3 = ":- halt."
+    target.write(line1)
+    target.write("\n")
+    target.write(line2)
+    target.write("\n")
+    target.write(line3)
+    target.write("\n")
+    target.close()
+
 def main():
     '''This is our main function!'''
 
@@ -19,8 +32,8 @@ def main():
         print "\nOptions:\n1. Get Artist Info\n2. Get Custom Playlist"
         user_input = input("Choose a function: ")
         if (user_input == 1):
-            artist = raw_input('Which artist would you like to search:')
-            # Still need to find way to pass param artist to the prolog.pl file
+            artist = str(raw_input('Which artist would you like to search:'))
+            artistSearchWrite(artist)
             pipe = subprocess.Popen("swipl --quiet prolog.pl", shell=True, stdout=subprocess.PIPE).stdout
             output = pipe.read()
         elif (user_input == 2):
@@ -29,8 +42,9 @@ def main():
         else:
             print "Invalid choice\n"
         
-        print '\n\n\nThe following is the ouput from prolog.pl:\n\n'
-        print output
+        print '\nThe following is the ouput from prolog.pl:\n\n'
+        test = output.splitlines()
+        print test
     
     return
 
