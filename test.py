@@ -41,7 +41,7 @@ def get_artist_info(artist_dict):
     artist = artist_dict["artist_name"]
 
     # create the new url for query
-    r = urllib.urlopen("http://musicbrainz.org/ws/2/artist?query=artist:\""+artist.replace(' ','%')+"\"").read()
+    r = urllib.urlopen("http://musicbrainz.org/ws/2/artist?query=artist:\""+artist.replace(' ','%20')+"\"").read()
     soup = BeautifulSoup(r, "lxml")
 
     artist_dict['artist_id'] = ""
@@ -245,6 +245,7 @@ def main():
                 print "hrmm, something went wrong, please try a new artist\n"
         else:
             print "invalid choice\n"
+        artist_dict = dict()
 
     return
 
