@@ -3,9 +3,16 @@ import subprocess
 
 # https://code.google.com/archive/p/pyswip/wikis/Examples.wiki
 
-# test = subprocess.Popen(["ping","-W","2","-c", "1", "192.168.1.70"], stdout=subprocess.PIPE)
+# mb_class(label).
+# mb_class(artist).
+# mb_class(work).
+# mb_class(recording).
+# mb_class(release).
+# mb_class('release-group').
+# mb_class(area).
+# mb_class(url).
 
-# output = test.communicate()[0]
+
 
 def artistSearchWrite (artist):
     target = open('prolog.pl', 'w')
