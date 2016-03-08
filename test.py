@@ -32,9 +32,15 @@ def get_artist_info(dct):
     url = "http://musicbrainz.org/ws/2/artist?query="
     for x in dct['tags']:
         url += "+tag:"+x
-    print url
 
-    
+    r = urllib.urlopen(url).read()
+    soup = BeautifulSoup(r, "lxml")
+    artist_names = list()
+    for element in soup.find_all("artist"):
+        artist_names.append(element.find("name").text)
+    print artist_names
+
+
     return
 
 def main():
