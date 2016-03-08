@@ -2,6 +2,13 @@
 from bs4 import BeautifulSoup
 import urllib
 from yt import getYTLink
+import string
+
+def isAscii(s):
+    for c in s:
+        if c not in string.ascii_letters:
+            return False
+    return True
 
 def get_similar_artists(artist, tags):
     # construct search url
@@ -49,7 +56,8 @@ def get_artist_info(artist_dict):
     # grab tags from query
     tags = list()
     for tag in soup.find_all("tag"):
-        tags.append(tag.find("name").text)
+        if isAscii(tag.find("name").text):
+            tags.append(tag.find("name").text)
     artist_dict['tags'] = tags
 
 
@@ -163,7 +171,7 @@ def main():
                     print "the top " + str(len(artist_dict['playlist-one'])) + " songs similar to " + artist_dict['artist_name'].lower() + " are:"
                 else:
                     print "the top 10 of " + str(len(artist_dict['playlist-one'])) + " most similar songs related to " + artist_dict['artist_name'].lower() + " are:"
-                
+
                 for index,x in enumerate(artist_dict['playlist-one']):
                     if index <= 9:
                         print x[0].lower() + " / " + x[1].lower() + " - score: " + str(x[2]) + " - video: " + x[3]
