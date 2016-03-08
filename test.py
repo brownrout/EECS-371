@@ -9,7 +9,7 @@ def get_similar_artists(artist, tags):
     for index, tag in enumerate(tags):
         url += "tag:" + tag.replace(' ','%')
         if index != stop:
-            url += "%20AND%20"
+            url += "+"
 
     # get response
     r = urllib.urlopen(url).read()
@@ -20,7 +20,7 @@ def get_similar_artists(artist, tags):
     for element in soup.find_all("artist"):
         _score = element.get('ext:score')
         _name = element.find("name").text
-        if _name.lower() != artist.lower() and int(_score) > 60:
+        if _name.lower() != artist.lower():
             artist_names.append([_name,_score])
 
     return artist_names
@@ -67,12 +67,18 @@ def main():
         if (user_input == 1):
             get_artist_info(artist_dict)
             print "\n"
-            print "we found " + str(len(artist_dict['similar artists'])) + " artists related to " + artist_dict['artist_name'].lower() + ":"
-            for x in artist_dict['similar artists']:
-                print x[0].lower() + " - score: " + str(x[1])
+            if len(artist_dict['similar artists']) == 0:
+                print "sorry, we couldn't find any artists similar to " + artist_dict['artist_name'].lower()
+            elif len(artist_dict['similar artists']) <= 5:
+                print "the top " + str(len(artist_dict['similar artists'])) + " artists similar to " + artist_dict['artist_name'].lower() + " are:"
+            else:
+                print "the top 5 of " + str(len(artist_dict['similar artists'])) + " most similar artists related to " + artist_dict['artist_name'].lower() + " are:"
+            for index,x in enumerate(artist_dict['similar artists']):
+                if index <= 4:
+                    print x[0].lower() + " - score: " + str(x[1])
             print "\n"
         else:
-            print "Invalid choice\n"
+            print "invalid choice\n"
 
     return
 
