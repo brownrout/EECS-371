@@ -130,7 +130,7 @@ def build_playlist(artist_dict):
     artist = artist_dict["artist_name"]
 
     # create the new url for query
-    r = urllib.urlopen("http://musicbrainz.org/ws/2/artist?query=artist:\""+artist.replace(' ','%')+"\"").read()
+    r = urllib.urlopen("http://musicbrainz.org/ws/2/artist?query=artist:\""+artist.replace(' ','%20')+"\"").read()
     soup = BeautifulSoup(r, "lxml")
 
     artist_dict['artist_id'] = ""
