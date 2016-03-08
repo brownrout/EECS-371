@@ -20,6 +20,9 @@ def artistSearchWrite (artist):
     target.write("\n")
     target.close()
 
+def clearFile(filename):
+    target = open('prolog.pl', 'w').close()
+
 def main():
     '''This is our main function!'''
 
@@ -36,6 +39,7 @@ def main():
             artistSearchWrite(artist)
             pipe = subprocess.Popen("swipl --quiet prolog.pl", shell=True, stdout=subprocess.PIPE).stdout
             output = pipe.read()
+            clearFile('prolog.pl')
         elif (user_input == 2):
             #unimplemented
             os.system("swipl --quiet prolog.pl")
