@@ -2,26 +2,36 @@
 from bs4 import BeautifulSoup
 import urllib
 
-def get_names(soup,dct):
+def get_names(dct):
+    artist = str(raw_input('Which artist would you like to search: '))
+    artist.replace(' ', '%')
+    r = urllib.urlopen("http://musicbrainz.org/ws/2/artist?query=artist:\""+artist+"\"").read()
+    soup = BeautifulSoup(r, "lxml")
     dct['artist_ids'] = []
-    # artists = soup.find_all("artist")
-    # for element in artists:
-    #     print element
-    #     # if element != '' and 'artist' in element.parent:
-    #     #     dct['names'].append(str(element.text).lower())
-    for tag in soup.find_all("artist"):
-        print tag.get('id')
-        dct['artist_ids'].append(tag.get('id'))
+    tag = soup.find("artist-list").find("artist")
+    artistID = tag.get('id')
+    dct['artist_ids'].append(tag.get('id'))
+    # print tag.get('id')
+    #     dct['artist_ids'].append(tag.get('id'))
     return
 
 def main():
     '''This is our main function!'''
-    r = urllib.urlopen("http://musicbrainz.org/ws/2/artist?query=arid:0383dadf-2a4e-4d10-a46a-e9e041da8eb3").read()
-    soup = BeautifulSoup(r, "lxml")
 
-    answers = {}
-    get_names(soup, answers)
-    print answers
+    print "starting music app...\n"
+
+    while True:
+        answers = {}
+        print '\n'
+        print "\nOptions:\n1. Get Artist Info"
+        user_input = input("Choose a function: ")
+        if (user_input == 1):
+            get_names(answers)
+            print answers
+
+        else:
+            print "Invalid choice\n"
+    
     return
 
 
