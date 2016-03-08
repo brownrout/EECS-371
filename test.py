@@ -14,7 +14,6 @@ def get_artist_info(dct):
     soup = BeautifulSoup(r, "lxml")
     
     #grab artist id from the query page
-    dct['artist_id'] = ""
     tag = soup.find("artist-list").find("artist")
     artistID = tag.get('id')
     dct['artist_id'] = tag.get('id')
@@ -28,8 +27,14 @@ def get_artist_info(dct):
     tags = soup.find_all("tag")
     for element in tags:
         for child in element.children:
-            dct['tags'].append(child.text)
+            dct['tags'].append(child.text.replace(' ', "%"))
 
+    url = "http://musicbrainz.org/ws/2/artist?query="
+    for x in dct['tags']:
+        url += "+tag:"+x
+    print url
+
+    
     return
 
 def main():
