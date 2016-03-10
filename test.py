@@ -102,21 +102,21 @@ def pretty_print_artist_facts(input_dict):
 
     # search for potential facts to print in artist_dict
     if input_dict.get('disambiguation'):
-        pretty_statements.append("Disambiguation: {}".format(input_dict.get('disambiguation')))
+        pretty_statements.append("disambiguation: {}".format(input_dict.get('disambiguation')))
     if input_dict.get('area'):
-        pretty_statements.append("Area: {}".format(input_dict.get('area')))
+        pretty_statements.append("area: {}".format(input_dict.get('area')))
     if input_dict.get('begin'):
-        pretty_statements.append("Born/Started in: {}".format(input_dict.get('begin')))
+        pretty_statements.append("born/started in: {}".format(input_dict.get('begin')))
     if input_dict.get('beginarea'):
-        pretty_statements.append("Begin Area: {}".format(input_dict.get('beginarea')))
+        pretty_statements.append("begin Area: {}".format(input_dict.get('beginarea')))
     if input_dict.get('end'):
-        pretty_statements.append("End: {}".format(input_dict.get('end')))
+        pretty_statements.append("end: {}".format(input_dict.get('end')))
     elif input_dict.get('ended'):
-        pretty_statements.append("Ended: {}".format(input_dict.get('ended')))
+        pretty_statements.append("ended: {}".format(input_dict.get('ended')))
     if input_dict.get('endarea'):
-        pretty_statements.append("End Area: {}".format(input_dict.get('endarea')))
+        pretty_statements.append("end area: {}".format(input_dict.get('endarea')))
     if len(pretty_statements) == 0:
-        pretty_statements.append("There doesn't seem to be much on this artist. Congratulations, you're officially a hipster")
+        pretty_statements.append("there doesn't seem to be much on this artist. congratulations, you're officially a hipster.")
 
     # print all facts and return
     print "\n".join(pretty_statements)
